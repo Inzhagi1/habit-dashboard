@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="color-scheme" content="light dark" />
   <title>داشبورد عادت‌ها</title>
+  <script src="https://telegram.org/js/telegram-web-app.js"></script>
   <style>
     @import url('https://fonts.googleapis.com/css2?family=Vazirmatn:wght@100..900&display=swap');
     :root {
@@ -717,7 +718,9 @@
         // ترتیب داده‌ها برای نمایش بصری از راست به چپ است؛ ماه اول سال در سمت راست قرار می‌گیرد.
         const displaySegments = [...monthSegments].reverse();
         track.innerHTML = displaySegments.map(segment => `<div class="season-segment${segment.season===currentSeason?' current-season':''}${segment.month===currentMonth?' current-month':''}" data-month="${escapeHtml(segment.fullName)}" data-season="${escapeHtml(seasonNames[segment.season])}" style="width:${segment.days/totalDays*100}%;background:${seasonColors[segment.season]}" title="${escapeHtml(segment.fullName)} · ${escapeHtml(seasonNames[segment.season])} · ${faDigits(segment.days)} روز"><span>${escapeHtml(segment.name)}</span></div>`).join('') + `<i class="season-marker" style="right:${pct}%"><span>امروز</span></i>`;
-        const compactYearBar = window.innerWidth <= 1100;
+        const telegramPlatform = window.Telegram && window.Telegram.WebApp ? window.Telegram.WebApp.platform : '';
+        const isTelegramDesktop = ['tdesktop','macos','webk','weba','web'].includes(telegramPlatform) || /TelegramDesktop/i.test(navigator.userAgent);
+        const compactYearBar = !isTelegramDesktop && window.innerWidth <= 1100;
         track.classList.toggle('compact', compactYearBar);
         $('mobileYearInfo').style.display = compactYearBar ? 'block' : 'none';
         track.querySelectorAll('.season-segment').forEach(segment => segment.addEventListener('click', () => showToast(`${segment.dataset.month} · ${segment.dataset.season}`)));
