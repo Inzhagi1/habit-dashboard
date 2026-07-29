@@ -170,6 +170,8 @@
     .season-segment:first-child { border-radius: 10px 0 0 10px; border-left: 0; }
     .season-segment:last-of-type { border-radius: 0 10px 10px 0; }
     .season-segment span { color: rgba(39,54,75,.8); font-size: 9px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 0 3px; direction: rtl; }
+    .year-season-track.compact .season-segment span,
+    .year-season-track.compact .season-marker span { display: none !important; }
     .season-segment.current-season { box-shadow: inset 0 -4px 0 rgba(39,54,75,.55); }
     .season-segment.current-month { outline: 2px solid var(--ink); outline-offset: -2px; z-index: 1; }
     .season-segment.current-season span, .season-segment.current-month span { color: #27364b; }
@@ -715,6 +717,9 @@
         // ترتیب داده‌ها برای نمایش بصری از راست به چپ است؛ ماه اول سال در سمت راست قرار می‌گیرد.
         const displaySegments = [...monthSegments].reverse();
         track.innerHTML = displaySegments.map(segment => `<div class="season-segment${segment.season===currentSeason?' current-season':''}${segment.month===currentMonth?' current-month':''}" data-month="${escapeHtml(segment.fullName)}" data-season="${escapeHtml(seasonNames[segment.season])}" style="width:${segment.days/totalDays*100}%;background:${seasonColors[segment.season]}" title="${escapeHtml(segment.fullName)} · ${escapeHtml(seasonNames[segment.season])} · ${faDigits(segment.days)} روز"><span>${escapeHtml(segment.name)}</span></div>`).join('') + `<i class="season-marker" style="right:${pct}%"><span>امروز</span></i>`;
+        const compactYearBar = window.innerWidth <= 1100 || /Telegram/i.test(navigator.userAgent) || (window.matchMedia && window.matchMedia('(pointer: coarse)').matches);
+        track.classList.toggle('compact', compactYearBar);
+        $('mobileYearInfo').style.display = compactYearBar ? 'block' : 'none';
         track.querySelectorAll('.season-segment').forEach(segment => segment.addEventListener('click', () => showToast(`${segment.dataset.month} · ${segment.dataset.season}`)));
         $('yearProgressRing').style.background = `conic-gradient(var(--primary) ${pct * 3.6}deg, var(--line) 0deg)`;
       }
@@ -872,5 +877,5 @@
       render();
     })();
   </script>
-</body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a22c9a73588bd36d',t:'MTc4NTMzMzEzOA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
