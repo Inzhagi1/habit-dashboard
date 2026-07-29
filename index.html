@@ -395,9 +395,7 @@
       .notes-card { grid-column: span 2; }
       /* Telegram WebView may report a wider CSS viewport on phones. Keep the year bar compact there too. */
       .year-season-track { height: 30px; }
-      .year-season-track .season-segment span { display: none; }
-      .year-season-track .season-marker span { display: none; }
-      .mobile-year-info { display: block; color: var(--muted); font-size: 10px; font-weight: 700; margin-top: 8px; text-align: right; }
+      .mobile-year-info { color: var(--muted); font-size: 10px; font-weight: 700; margin-top: 8px; text-align: right; }
     }
     @media (max-width: 560px) {
       .main { padding: 15px 10px 32px; } .sidebar { display: none; }
@@ -407,9 +405,7 @@
       .year-progress-card { gap: 12px; padding: 15px; }
       .year-progress-card h2 { font-size: 14px; }
       .year-season-track { height: 30px; }
-      .year-season-track .season-segment span { display: none; }
-      .year-season-track .season-marker span { display: none; }
-      .mobile-year-info { display: block; color: var(--muted); font-size: 10px; font-weight: 700; margin-top: 8px; text-align: right; }
+      .mobile-year-info { color: var(--muted); font-size: 10px; font-weight: 700; margin-top: 8px; text-align: right; }
       .top-actions { display: grid; grid-template-columns: 1fr 1fr; } .top-actions .calendar-system-toggle, .top-actions .theme-toggle, .top-actions .primary { grid-column: span 2; justify-self: stretch; } .calendar-system-toggle { justify-content: center; }
     }
   </style>
@@ -760,7 +756,10 @@
         // ترتیب داده‌ها برای نمایش بصری از راست به چپ است؛ ماه اول سال در سمت راست قرار می‌گیرد.
         const displaySegments = [...monthSegments].reverse();
         track.innerHTML = displaySegments.map(segment => `<div class="season-segment${segment.season===currentSeason?' current-season':''}${segment.month===currentMonth?' current-month':''}" data-month="${escapeHtml(segment.fullName)}" data-season="${escapeHtml(seasonNames[segment.season])}" style="width:${segment.days/totalDays*100}%;background:${seasonColors[segment.season]}" title="${escapeHtml(segment.fullName)} · ${escapeHtml(seasonNames[segment.season])} · ${faDigits(segment.days)} روز"><span>${escapeHtml(segment.name)}</span></div>`).join('') + `<i class="season-marker" style="right:${pct}%"><span>امروز</span></i>`;
-        const compactYearBar = window.innerWidth <= 1100;
+        const userAgent = navigator.userAgent || '';
+        const isMobileDevice = /Android|iPhone|iPad|iPod|Mobile/i.test(userAgent);
+        const isDesktopEnvironment = /TelegramDesktop|tdesktop|Windows NT|Macintosh|X11|Linux x86_64/i.test(userAgent) && !isMobileDevice;
+        const compactYearBar = !isDesktopEnvironment && window.innerWidth <= 1100;
         track.classList.toggle('compact', compactYearBar);
         $('mobileYearInfo').style.display = compactYearBar ? 'block' : 'none';
         track.querySelectorAll('.season-segment').forEach(segment => segment.addEventListener('click', () => showToast(`${segment.dataset.month} · ${segment.dataset.season}`)));
@@ -982,5 +981,5 @@
       window.addEventListener('load', () => setTimeout(initializeCurrentView, 50));
     })();
   </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a22d76978f728f1a',t:'MTc4NTM0MjE1NQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</body>
 </html>
