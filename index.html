@@ -65,6 +65,7 @@
     html[data-theme="dark"] .btn.primary { background: var(--primary); color: #fff; }
     html[data-theme="dark"] .btn.ghost { background: transparent; }
     html[data-theme="dark"] .calendar-system-toggle { background: var(--surface); }
+    html[data-theme="dark"] .period-menu { box-shadow: 0 14px 30px rgba(0,0,0,.35); }
     html[data-theme="dark"] .day-label.today { background: #2a2851; }
     html[data-theme="dark"] .check { border-color: #435267; }
     html[data-theme="dark"] .chart-grid-line { stroke: #2d3a4b; }
@@ -126,7 +127,7 @@
     .side-tip b { color: var(--ink); display: block; margin-bottom: 5px; }
     .side-tip p { margin: 0; font-size: 11px; line-height: 1.8; }
     .main { width: min(100%, 1500px); margin: 0 auto; padding: 24px 28px 44px; min-width: 0; }
-    .topbar { display: flex; justify-content: space-between; gap: 15px; align-items: center; margin-bottom: 22px; }
+    .topbar { display: flex; justify-content: space-between; gap: 15px; align-items: center; margin-bottom: 22px; position: relative; z-index: 20; }
     .breadcrumb { color: var(--muted); font-size: 11px; margin-bottom: 4px; }
     h1, h2, h3, p { margin-top: 0; }
     h1 { font-size: 24px; margin: 0; letter-spacing: -.4px; }
@@ -138,11 +139,21 @@
     .system-btn { height: 30px; border: 0; border-radius: 7px; padding: 0 9px; color: var(--muted); background: transparent; font-size: 10px; }
     .system-btn.active, .system-btn:hover { background: var(--lavender); color: var(--primary); font-weight: 700; }
     .select-wrap { position: relative; }
+    .period-picker { min-width: 130px; height: 38px; border: 1px solid var(--line); background: var(--surface-raised); color: var(--ink); border-radius: 10px; padding: 0 10px; outline: none; display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+    .period-picker:hover, .period-picker:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(112,102,239,.12); }
+    .period-picker b { color: var(--muted); font-size: 16px; line-height: 1; }
+    .period-menu { display: none; position: absolute; top: calc(100% + 6px); right: 0; min-width: 100%; max-height: 250px; overflow-y: auto; z-index: 60; padding: 5px; border: 1px solid var(--line); border-radius: 11px; background: var(--surface-raised) !important; color: var(--ink) !important; box-shadow: 0 14px 30px rgba(31,45,65,.18); }
+    .period-menu.open { display: flex !important; flex-direction: column; gap: 3px; }
+    .period-option { display: block !important; width: 100%; min-height: 32px; border: 0; border-radius: 7px; background: transparent !important; color: var(--ink) !important; text-align: right; padding: 5px 9px; font-size: 11px; opacity: 1; visibility: visible; }
+    .period-option:hover, .period-option.selected { background: var(--lavender); color: var(--primary); font-weight: 700; }
+    .native-period-select { position: absolute; width: 1px !important; height: 1px !important; opacity: 0 !important; pointer-events: none; }
     .select-wrap select, .btn {
       border: 1px solid var(--line); background: var(--surface-raised); color: var(--ink); border-radius: 10px;
       height: 38px; padding: 0 12px; outline: none; transition: .2s;
     }
     .select-wrap select { min-width: 130px; appearance: auto; }
+    .select-wrap option { color: #27364b; background: #f7f9fa; }
+    html[data-theme="dark"] .select-wrap option { color: #e7edf5; background: #1b2634; }
     .select-wrap select:focus, .btn:focus, input:focus, textarea:focus { border-color: var(--primary); box-shadow: 0 0 0 3px rgba(112,102,239,.12); }
     .btn { display: inline-flex; gap: 7px; align-items: center; justify-content: center; white-space: nowrap; }
     .btn:hover { border-color: #c9c4ff; background: #faf9ff; }
@@ -425,8 +436,8 @@
       <header class="topbar">
         <div><div class="breadcrumb">فضای شخصی / <span id="breadcrumbPeriod">July 2026</span></div><h1>داشبورد عادت‌ها</h1></div>
         <div class="top-actions">
-          <div class="select-wrap"><select id="periodMonth" aria-label="ماه"></select></div>
-          <div class="select-wrap"><select id="periodYear" aria-label="سال"></select></div>
+          <div class="select-wrap"><select id="periodMonth" aria-label="انتخاب ماه"><option value="1">فروردین</option><option value="2">اردیبهشت</option><option value="3">خرداد</option><option value="4">تیر</option><option value="5">مرداد</option><option value="6">شهریور</option><option value="7">مهر</option><option value="8">آبان</option><option value="9">آذر</option><option value="10">دی</option><option value="11">بهمن</option><option value="12">اسفند</option></select></div>
+          <div class="select-wrap"><select id="periodYear" aria-label="انتخاب سال"><option value="1400">1400</option><option value="1401">1401</option><option value="1402">1402</option><option value="1403">1403</option><option value="1404">1404</option><option value="1405">1405</option><option value="1406">1406</option><option value="1407">1407</option><option value="1408">1408</option><option value="1409">1409</option><option value="1410">1410</option></select></div>
           <button class="btn ghost theme-toggle" data-theme-toggle><span class="theme-icon">☾</span><span class="theme-label">دارک مود</span></button>
           <button class="btn ghost" id="restoreNotesBtn" style="display:none">＋ پنل یادداشت‌ها</button>
           <button class="btn primary" id="addHabitBtn">＋ افزودن عادت</button>
@@ -436,7 +447,7 @@
       <section class="hero">
         <div class="hero-content"><h2 id="heroPeriod">مرداد ۱۴۰۵</h2><p class="hero-date" id="heroDate">امروز، ۷ مرداد ۱۴۰۵</p></div>
         <div class="hero-quote"><span class="quote-label">✦ جمله انگیزشی روز</span><blockquote id="quoteText">هر روز فرصتی تازه برای بهتر شدن است.</blockquote></div>
-        <button class="btn" id="todayBtn">بازگشت به ماه جاری</button>
+        <button type="button" class="btn" id="todayBtn" onclick="window.habitFlowGoToCurrentMonth && window.habitFlowGoToCurrentMonth()">بازگشت به ماه جاری</button>
       </section>
 
       <section class="card year-progress-card" id="yearProgressCard">
@@ -860,15 +871,21 @@
       }
       function goToCurrentMonth() {
         const now = new Date();
-        state.periods = state.periods || {};
-        selectedQuoteDate = dateKey(now);
         const [jy,jm] = gregorianToJalali(now.getFullYear(), now.getMonth()+1, now.getDate());
-        state.mode = 'jalali';
-        state.periods.jalali = { year: jy, month: jm };
         const [gy,gm] = jalaliToGregorian(jy,jm,1);
-        state.year = gy; state.month = gm - 1;
-        saveState(); render(); showToast('به ماه جاری برگشتی.');
+        state.mode = 'jalali';
+        state.periods = { jalali: { year: jy, month: jm } };
+        state.year = gy;
+        state.month = gm - 1;
+        selectedQuoteDate = dateKey(now);
+        // مقدار کنترل‌ها را هم مستقیم تنظیم می‌کنیم تا حتی در صورت تأخیر رندر، فوراً به ماه جاری برگردند.
+        $('periodMonth').value = jm;
+        $('periodYear').value = jy;
+        saveState();
+        render();
+        showToast(`به ${jalaliMonths[jm-1]} ${faDigits(jy)} برگشتی.`);
       }
+      window.habitFlowGoToCurrentMonth = goToCurrentMonth;
       function renderCategoryControls(selected='') {
         state.categories = state.categories || [...defaultCategories];
         if (selected && !state.categories.includes(selected)) state.categories.push(selected);
@@ -935,7 +952,7 @@
       $('addHabitBtn').addEventListener('click',()=>openModal()); $('closeModal').addEventListener('click',closeModal); $('cancelModal').addEventListener('click',closeModal); $('modalBackdrop').addEventListener('click',e=>{if(e.target===$('modalBackdrop'))closeModal();});
       $('habitColor').addEventListener('input',e=>$('colorValue').textContent=e.target.value);
       $('manageCategoriesBtn').addEventListener('click',toggleCategoryPanel);
-      $('categoryPanel .close-category-panel').addEventListener('click',()=>{ $('categoryPanel').hidden=true; });
+      $('categoryPanel').querySelector('.close-category-panel').addEventListener('click',()=>{ $('categoryPanel').hidden=true; });
       $('categoryForm').addEventListener('submit',e=>{e.preventDefault();addCategory($('categoryName').value);});
       $('habitForm').addEventListener('submit',e=>{e.preventDefault(); const name=$('habitName').value.trim(); if(!name)return; const payload={name,category:$('habitCategory').value,goal:Math.max(1,Math.min(31,Number($('habitGoal').value)||20)),color:$('habitColor').value}; if(editingId){Object.assign(state.habits.find(h=>h.id===editingId),payload);showToast('عادت ویرایش شد.');}else{state.habits.push({...payload,id:uid(),active:true});showToast('عادت جدید اضافه شد.');} saveState();closeModal();render();});
       $('noteForm').addEventListener('submit',e=>{e.preventDefault();const value=$('noteInput').value.trim();if(!value)return;state.notes.push(value);state.notes=state.notes.slice(-12);saveState();$('noteInput').value='';renderNotes();showToast('یادداشت ذخیره شد.');});
@@ -948,5 +965,5 @@
       render();
     })();
   </script>
-</body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a22d062bdf65377c',t:'MTc4NTMzNzU1MA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a22d0946ce63377c',t:'MTc4NTMzNzY3Nw=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a22d0da228b1377c',t:'MTc4NTMzNzg1Ng=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script><script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a22d173d79d8377c',t:'MTc4NTMzODI0OQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
