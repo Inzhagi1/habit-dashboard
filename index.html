@@ -183,6 +183,7 @@
     .season-item.current { color: var(--ink); font-weight: 800; }
     .year-progress-meta { display: flex; justify-content: space-between; gap: 12px; color: var(--muted); font-size: 10px; margin-top: 8px; }
     .year-progress-meta b { color: var(--ink); font-weight: 600; }
+    .mobile-year-info { display: none; }
     .year-ring { width: 102px; height: 102px; flex: 0 0 auto; border-radius: 50%; display: grid; place-items: center; background: conic-gradient(var(--primary) 0deg, var(--line) 0deg); position: relative; }
     .year-ring::after { content: ''; position: absolute; inset: 10px; border-radius: 50%; background: var(--surface); }
     .year-ring > div { position: relative; z-index: 1; text-align: center; }
@@ -361,12 +362,23 @@
       .layout, .charts, .bottom-grid { grid-template-columns: 1fr; }
       .side-stack { grid-template-columns: repeat(2, minmax(0, 1fr)); }
       .notes-card { grid-column: span 2; }
+      /* Telegram WebView may report a wider CSS viewport on phones. Keep the year bar compact there too. */
+      .year-season-track { height: 30px; }
+      .year-season-track .season-segment span { display: none; }
+      .year-season-track .season-marker span { display: none; }
+      .mobile-year-info { display: block; color: var(--muted); font-size: 10px; font-weight: 700; margin-top: 8px; text-align: right; }
     }
     @media (max-width: 560px) {
       .main { padding: 15px 10px 32px; } .sidebar { display: none; }
       .stats { gap: 8px; } .stat { padding: 12px; min-height: 80px; } .stat-value { font-size: 18px; }
       .side-stack { grid-template-columns: 1fr; } .notes-card { grid-column: auto; }
       .hero { padding: 19px; } .hero h2 { font-size: 20px; }
+      .year-progress-card { gap: 12px; padding: 15px; }
+      .year-progress-card h2 { font-size: 14px; }
+      .year-season-track { height: 30px; }
+      .year-season-track .season-segment span { display: none; }
+      .year-season-track .season-marker span { display: none; }
+      .mobile-year-info { display: block; color: var(--muted); font-size: 10px; font-weight: 700; margin-top: 8px; text-align: right; }
       .top-actions { display: grid; grid-template-columns: 1fr 1fr; } .top-actions .calendar-system-toggle, .top-actions .theme-toggle, .top-actions .primary { grid-column: span 2; justify-self: stretch; } .calendar-system-toggle { justify-content: center; }
     }
   </style>
@@ -411,6 +423,7 @@
           <h2 id="yearProgressTitle">روزهای رفته از سال میلادی</h2>
           <p id="yearProgressSubtitle">درصد سپری‌شده و فصل جاری بر اساس تاریخ امروز</p>
           <div class="year-season-track" id="yearSeasonTrack"></div>
+          <div class="mobile-year-info" id="mobileYearInfo"></div>
           <div class="year-progress-meta"><span id="yearProgressDay">روز ۰ از ۰</span><b id="yearProgressDate">—</b></div>
         </div>
         <div class="year-ring" id="yearProgressRing"><div><strong id="yearProgressPct">۰٪</strong><small id="yearProgressLabel">روزهای رفته</small></div></div>
@@ -697,10 +710,12 @@
         $('yearProgressPct').textContent = pctText;
         $('yearProgressDay').textContent = `روز ${faDigits(day)} از ${faDigits(totalDays)}`;
         $('yearProgressDate').textContent = dateLabel;
+        $('mobileYearInfo').textContent = `امروز: ${dateLabel} · فصل جاری: ${seasonNames[currentSeason]}`;
         const track = $('yearSeasonTrack');
         // ترتیب داده‌ها برای نمایش بصری از راست به چپ است؛ ماه اول سال در سمت راست قرار می‌گیرد.
         const displaySegments = [...monthSegments].reverse();
-        track.innerHTML = displaySegments.map(segment => `<div class="season-segment${segment.season===currentSeason?' current-season':''}${segment.month===currentMonth?' current-month':''}" style="width:${segment.days/totalDays*100}%;background:${seasonColors[segment.season]}" title="${segment.fullName} · ${seasonNames[segment.season]} · ${faDigits(segment.days)} روز"><span>${segment.name}</span></div>`).join('') + `<i class="season-marker" style="right:${pct}%"><span>امروز</span></i>`;
+        track.innerHTML = displaySegments.map(segment => `<div class="season-segment${segment.season===currentSeason?' current-season':''}${segment.month===currentMonth?' current-month':''}" data-month="${escapeHtml(segment.fullName)}" data-season="${escapeHtml(seasonNames[segment.season])}" style="width:${segment.days/totalDays*100}%;background:${seasonColors[segment.season]}" title="${escapeHtml(segment.fullName)} · ${escapeHtml(seasonNames[segment.season])} · ${faDigits(segment.days)} روز"><span>${escapeHtml(segment.name)}</span></div>`).join('') + `<i class="season-marker" style="right:${pct}%"><span>امروز</span></i>`;
+        track.querySelectorAll('.season-segment').forEach(segment => segment.addEventListener('click', () => showToast(`${segment.dataset.month} · ${segment.dataset.season}`)));
         $('yearProgressRing').style.background = `conic-gradient(var(--primary) ${pct * 3.6}deg, var(--line) 0deg)`;
       }
       function renderStats(data) {
@@ -857,5 +872,5 @@
       render();
     })();
   </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a22c2dbf4f54dbeb',t:'MTc4NTMyODY4NQ=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</body>
 </html>
