@@ -342,6 +342,24 @@
     .form-grid { display: grid; gap: 12px; }
     .field { display: grid; gap: 5px; }
     .field label { color: #728096; font-size: 11px; }
+    .category-select-row { display: flex; gap: 6px; align-items: center; }
+    .category-select-row select { min-width: 0; flex: 1; }
+    .category-manage-btn { width: 39px; height: 39px; border: 1px solid var(--line); border-radius: 9px; background: var(--surface-raised); color: var(--primary); font-size: 17px; }
+    .category-manage-btn:hover { background: var(--lavender); border-color: #c9c4ff; }
+    .category-panel { margin-top: 8px; padding: 10px; border: 1px solid var(--line); border-radius: 11px; background: rgba(112,102,239,.035); }
+    .category-panel[hidden] { display: none; }
+    .category-panel-head { display: flex; align-items: center; justify-content: space-between; color: var(--ink); font-size: 10px; font-weight: 700; margin-bottom: 7px; }
+    .category-list { display: grid; gap: 5px; max-height: 145px; overflow-y: auto; }
+    .category-row { display: flex; align-items: center; gap: 5px; padding: 5px 7px; border: 1px solid var(--line); border-radius: 7px; background: var(--surface-raised); }
+    .category-row span { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; color: var(--ink); font-size: 10px; }
+    .category-row button { border: 0; background: transparent; color: #9aa6b4; width: 23px; height: 23px; border-radius: 6px; padding: 0; }
+    .category-row button:hover { background: var(--lavender); color: var(--primary); }
+    .category-row button.delete:hover { background: #ffe8eb; color: #d26c7b; }
+    .category-add-form { display: flex; gap: 5px; margin-top: 8px; }
+    .category-add-form input { min-width: 0; flex: 1; height: 31px; border: 1px solid var(--line); border-radius: 8px; padding: 0 8px; outline: none; color: var(--ink); background: var(--surface-raised); }
+    .category-add-form button { height: 31px; border: 0; border-radius: 8px; padding: 0 9px; background: var(--primary); color: #fff; font-size: 10px; }
+    html[data-theme="dark"] .category-panel { background: rgba(112,102,239,.10); }
+    html[data-theme="dark"] .category-row button.delete:hover { background: #3b242c; color: #f29aaa; }
     .field input, .field select { border: 1px solid var(--line); border-radius: 9px; height: 39px; outline: none; padding: 0 10px; color: var(--ink); background: var(--surface-raised); }
     .field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
     .color-input { display: flex; align-items: center; gap: 8px; border: 1px solid var(--line); border-radius: 9px; height: 39px; padding: 0 8px; }
@@ -457,7 +475,7 @@
     </main>
   </div>
 
-  <div class="modal-backdrop" id="modalBackdrop"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><div class="modal-head"><h2 id="modalTitle">افزودن عادت</h2><button class="close" id="closeModal">×</button></div><form id="habitForm"><div class="form-grid"><div class="field"><label for="habitName">نام عادت</label><input id="habitName" required maxlength="42" placeholder="مثلاً: مطالعه ۲۰ دقیقه" /></div><div class="field-row"><div class="field"><label for="habitCategory">دسته‌بندی</label><select id="habitCategory"><option>سلامت</option><option>یادگیری</option><option>تمرکز</option><option>خودمراقبتی</option><option>شخصی</option></select></div><div class="field"><label for="habitGoal">هدف ماهانه</label><input id="habitGoal" type="number" min="1" max="31" value="20" /></div></div><div class="field"><label for="habitColor">رنگ عادت</label><div class="color-input"><input id="habitColor" type="color" value="#55a9ed" /><span id="colorValue">#55a9ed</span></div></div></div><div class="modal-actions"><button type="button" class="btn" id="cancelModal">انصراف</button><button type="submit" class="btn primary">ذخیره عادت</button></div></form></div></div>
+  <div class="modal-backdrop" id="modalBackdrop"><div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle"><div class="modal-head"><h2 id="modalTitle">افزودن عادت</h2><button class="close" id="closeModal">×</button></div><form id="habitForm"><div class="form-grid"><div class="field"><label for="habitName">نام عادت</label><input id="habitName" required maxlength="42" placeholder="مثلاً: مطالعه ۲۰ دقیقه" /></div><div class="field-row"><div class="field"><label for="habitCategory">دسته‌بندی</label><div class="category-select-row"><select id="habitCategory"></select><button type="button" class="category-manage-btn" id="manageCategoriesBtn" title="مدیریت دسته‌بندی‌ها" aria-label="مدیریت دسته‌بندی‌ها">＋</button></div><div class="category-panel" id="categoryPanel" hidden><div class="category-panel-head"><span>مدیریت دسته‌بندی‌ها</span><button type="button" class="close-category-panel" aria-label="بستن">×</button></div><div class="category-list" id="categoryList"></div><form class="category-add-form" id="categoryForm"><input id="categoryName" maxlength="25" placeholder="دسته‌بندی جدید..." /><button type="submit">افزودن</button></form></div></div><div class="field"><label for="habitGoal">هدف ماهانه</label><input id="habitGoal" type="number" min="1" max="31" value="20" /></div></div><div class="field"><label for="habitColor">رنگ عادت</label><div class="color-input"><input id="habitColor" type="color" value="#55a9ed" /><span id="colorValue">#55a9ed</span></div></div></div><div class="modal-actions"><button type="button" class="btn" id="cancelModal">انصراف</button><button type="submit" class="btn primary">ذخیره عادت</button></div></form></div></div>
   <div class="toast" id="toast"></div>
 
   <script>
@@ -474,6 +492,7 @@
       const defaultHabits = [
         ['۳۰ دقیقه مطالعه','یادگیری',30], ['۳۰ دقیقه ورزش','سلامت',30], ['روزی ۸ لیوان آب','سلامت',30], ['۲۰ دقیقه مدیتیشن','تمرکز',20], ['درس / کار عمیق','یادگیری',28], ['حمام','خودمراقبتی',15], ['تنفس عمیق','سلامت',14], ['خواب به‌موقع','سلامت',14], ['مسواک صبح','خودمراقبتی',28], ['مسواک شب','خودمراقبتی',28], ['مرتب‌کردن اتاق','شخصی',20], ['زبان انگلیسی','یادگیری',28]
       ];
+      const defaultCategories = ['سلامت','یادگیری','تمرکز','خودمراقبتی','شخصی'];
       // 31 شروع و 12 پایان متفاوت، برای ساخت 365 جمله‌ی یکتا؛ هر روز سال یک ترکیب مخصوص دارد.
       const quoteStarts = [
         'امروز فقط یک قدم کوچک بردار', 'شروع کردن را به کامل بودن ترجیح بده', 'باور کن توان تو از تردیدهایت بزرگ‌تر است', 'کاری را که مهم است، همین حالا آغاز کن', 'به مسیرت اعتماد کن، حتی اگر آهسته پیش می‌روی',
@@ -534,7 +553,7 @@
       }
       function makeHabit(tuple, i) { return { id: uid(), name: tuple[0], category: tuple[1], goal: tuple[2], color: colors[i % colors.length], active: true }; }
       function makeInitialState() {
-        const base = { year: 2026, month: 6, mode: 'jalali', theme: 'light', periodsVersion: 3, periods: { jalali: { year: 1405, month: 5 } }, habits: defaultHabits.map(makeHabit), checks: {}, notes: ['شروع کوچک، نتیجه بزرگ.', 'امروز روی استمرار تمرکز می‌کنم.'], notesPanelVisible: true, reflection: '' };
+        const base = { year: 2026, month: 6, mode: 'jalali', theme: 'light', periodsVersion: 3, periods: { jalali: { year: 1405, month: 5 } }, habits: defaultHabits.map(makeHabit), categories: [...defaultCategories], checks: {}, notes: ['شروع کوچک، نتیجه بزرگ.', 'امروز روی استمرار تمرکز می‌کنم.'], notesPanelVisible: true, reflection: '' };
         // A few deterministic sample marks make the first screen useful immediately.
         base.habits.forEach((habit, i) => {
           for (let d = 1; d <= 29; d++) {
@@ -549,6 +568,8 @@
           if (parsed && parsed.habits && parsed.checks) {
             parsed.theme = parsed.theme || 'light';
             parsed.notesPanelVisible = parsed.notesPanelVisible !== false;
+            parsed.categories = Array.isArray(parsed.categories) && parsed.categories.length ? [...new Set(parsed.categories.filter(Boolean))] : [...defaultCategories];
+            (parsed.habits || []).forEach(habit => { if (habit.category && !parsed.categories.includes(habit.category)) parsed.categories.push(habit.category); });
             // داشبورد از این نسخه فقط با تقویم شمسی کار می‌کند.
             let jalaliPeriod = parsed.periods && parsed.periods.jalali;
             if (!jalaliPeriod) {
@@ -848,9 +869,53 @@
         state.year = gy; state.month = gm - 1;
         saveState(); render(); showToast('به ماه جاری برگشتی.');
       }
+      function renderCategoryControls(selected='') {
+        state.categories = state.categories || [...defaultCategories];
+        if (selected && !state.categories.includes(selected)) state.categories.push(selected);
+        const select = $('habitCategory');
+        select.innerHTML = state.categories.map(category => `<option value="${escapeHtml(category)}">${escapeHtml(category)}</option>`).join('');
+        select.value = selected && state.categories.includes(selected) ? selected : (state.categories[0] || '');
+        const list = $('categoryList');
+        list.innerHTML = state.categories.map(category => `<div class="category-row"><span>${escapeHtml(category)}</span><button type="button" class="edit-category" data-category="${escapeHtml(category)}" title="ویرایش">✎</button><button type="button" class="delete delete-category" data-category="${escapeHtml(category)}" title="حذف">×</button></div>`).join('');
+        list.querySelectorAll('.edit-category').forEach(button => button.addEventListener('click', () => editCategory(button.dataset.category)));
+        list.querySelectorAll('.delete-category').forEach(button => button.addEventListener('click', () => deleteCategory(button.dataset.category)));
+      }
+      function addCategory(name) {
+        const category = name.trim();
+        if (!category) return;
+        if (state.categories.includes(category)) { showToast('این دسته‌بندی قبلاً وجود دارد.'); return; }
+        state.categories.push(category); saveState(); renderCategoryControls(category); $('categoryName').value=''; showToast('دسته‌بندی اضافه شد.');
+      }
+      function editCategory(oldName) {
+        const next = prompt('نام جدید دسته‌بندی:', oldName);
+        if (next === null) return;
+        const newName = next.trim();
+        if (!newName || newName === oldName) return;
+        if (state.categories.includes(newName)) { showToast('این نام قبلاً استفاده شده است.'); return; }
+        const index = state.categories.indexOf(oldName);
+        if (index < 0) return;
+        state.categories[index] = newName;
+        state.habits.forEach(habit => { if (habit.category === oldName) habit.category = newName; });
+        saveState(); renderCategoryControls(newName); showToast('دسته‌بندی ویرایش شد.');
+      }
+      function deleteCategory(name) {
+        if (state.categories.length <= 1) { showToast('حداقل یک دسته‌بندی باید باقی بماند.'); return; }
+        const replacement = state.categories.find(category => category !== name);
+        const usedBy = state.habits.filter(habit => habit.category === name).length;
+        const message = usedBy ? `این دسته‌بندی برای ${usedBy} عادت استفاده شده است. عادت‌ها به «${replacement}» منتقل و دسته‌بندی حذف شود؟` : `دسته‌بندی «${name}» حذف شود؟`;
+        if (!confirm(message)) return;
+        state.habits.forEach(habit => { if (habit.category === name) habit.category = replacement; });
+        state.categories = state.categories.filter(category => category !== name);
+        saveState(); renderCategoryControls(state.categories[0]); showToast('دسته‌بندی حذف شد.');
+      }
+      function toggleCategoryPanel() {
+        const panel = $('categoryPanel');
+        panel.hidden = !panel.hidden;
+        if (!panel.hidden) renderCategoryControls($('habitCategory').value);
+      }
       function openModal(id=null) {
         editingId=id; $('modalTitle').textContent=id?'ویرایش عادت':'افزودن عادت';
-        const h=id?state.habits.find(x=>x.id===id):null; $('habitName').value=h?h.name:''; $('habitCategory').value=h?h.category:'سلامت'; $('habitGoal').value=h?h.goal:20; $('habitColor').value=h?h.color:'#55a9ed'; $('colorValue').textContent=h?h.color:'#55a9ed'; $('modalBackdrop').classList.add('open'); setTimeout(()=>$('habitName').focus(),50);
+        const h=id?state.habits.find(x=>x.id===id):null; $('habitName').value=h?h.name:''; $('habitGoal').value=h?h.goal:20; $('habitColor').value=h?h.color:'#55a9ed'; $('colorValue').textContent=h?h.color:'#55a9ed'; $('categoryPanel').hidden=true; renderCategoryControls(h?h.category:'سلامت'); $('modalBackdrop').classList.add('open'); setTimeout(()=>$('habitName').focus(),50);
       }
       function closeModal() { $('modalBackdrop').classList.remove('open'); editingId=null; }
       function deleteAllHabits() {
@@ -869,6 +934,9 @@
       document.querySelectorAll('[data-mode]').forEach(b=>b.addEventListener('click',()=>switchMode(b.dataset.mode)));
       $('addHabitBtn').addEventListener('click',()=>openModal()); $('closeModal').addEventListener('click',closeModal); $('cancelModal').addEventListener('click',closeModal); $('modalBackdrop').addEventListener('click',e=>{if(e.target===$('modalBackdrop'))closeModal();});
       $('habitColor').addEventListener('input',e=>$('colorValue').textContent=e.target.value);
+      $('manageCategoriesBtn').addEventListener('click',toggleCategoryPanel);
+      $('categoryPanel .close-category-panel').addEventListener('click',()=>{ $('categoryPanel').hidden=true; });
+      $('categoryForm').addEventListener('submit',e=>{e.preventDefault();addCategory($('categoryName').value);});
       $('habitForm').addEventListener('submit',e=>{e.preventDefault(); const name=$('habitName').value.trim(); if(!name)return; const payload={name,category:$('habitCategory').value,goal:Math.max(1,Math.min(31,Number($('habitGoal').value)||20)),color:$('habitColor').value}; if(editingId){Object.assign(state.habits.find(h=>h.id===editingId),payload);showToast('عادت ویرایش شد.');}else{state.habits.push({...payload,id:uid(),active:true});showToast('عادت جدید اضافه شد.');} saveState();closeModal();render();});
       $('noteForm').addEventListener('submit',e=>{e.preventDefault();const value=$('noteInput').value.trim();if(!value)return;state.notes.push(value);state.notes=state.notes.slice(-12);saveState();$('noteInput').value='';renderNotes();showToast('یادداشت ذخیره شد.');});
       $('removeNotesPanel').addEventListener('click',removeNotesPanel);
