@@ -246,6 +246,7 @@
     .habit-row:last-child { border-bottom: 0; }
     .habit-name { padding: 7px 9px; font-size: 10px; display: flex; align-items: center; gap: 7px; background: var(--surface-raised); position: sticky; right: 0; z-index: 2; direction: rtl; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
     .habit-name > span { min-width: 0; overflow: hidden; text-overflow: ellipsis; flex: 1; }
+    .habit-count { flex: 0 0 auto; color: var(--primary); background: var(--lavender); border-radius: 6px; padding: 1px 5px; font-size: 9px; font-weight: 800; direction: rtl; white-space: nowrap; }
     .habit-name.editable { cursor: pointer; }
     .habit-name.editable:hover { background: var(--lavender); }
     .habit-name.editable::after { content: '✎'; color: #9aa6b4; font-size: 10px; margin-right: 2px; opacity: .7; }
@@ -667,7 +668,9 @@
         let rows = `<div class="calendar-weeks"><div class="corner">روز / عادت</div>${bands}</div><div class="calendar-days"><div class="corner">${state.mode==='jalali'?'شمسی':'روزهای ماه'}</div>${labels}</div>`;
         activeHabits().forEach(habit => {
           const cells = dates.map(date => { const checked=isChecked(date,habit.id); const future=date > today && dateKey(date)!==dateKey(today); const sunday=date.getDay()===6?' sunday':''; return `<div class="cell${sunday}" style="background:${hexToRgba(habit.color,.045)}"><button class="check${checked?' checked':''}${future?' future':''}" style="--habit-color:${habit.color}" data-date="${dateKey(date)}" data-habit="${habit.id}" title="${escapeHtml(motivationalQuotes[quoteIndexForDate(date)])}" aria-label="${habit.name} - ${dateKey(date)}" aria-pressed="${checked}"${future?' disabled':''}></button></div>`; }).join('');
-          rows += `<div class="habit-row"><div class="habit-name editable" data-edit-habit="${habit.id}" title="برای ویرایش عادت کلیک کنید"><i class="habit-dot" style="background:${habit.color}"></i><span>${escapeHtml(habit.name)}</span><button class="row-delete" data-delete-habit="${habit.id}" title="حذف عادت" aria-label="حذف ${escapeHtml(habit.name)}">×</button></div>${cells}</div>`;
+          const completedCount = dates.reduce((total,date) => total + (isChecked(date,habit.id) ? 1 : 0), 0);
+          const habitGoal = Number(habit.goal) || dates.length;
+          rows += `<div class="habit-row"><div class="habit-name editable" data-edit-habit="${habit.id}" title="برای ویرایش عادت کلیک کنید"><i class="habit-dot" style="background:${habit.color}"></i><span>${escapeHtml(habit.name)}</span><small class="habit-count" title="${faDigits(completedCount)} از ${faDigits(habitGoal)} هدف انجام شده">${faDigits(completedCount)} از ${faDigits(habitGoal)}</small><button class="row-delete" data-delete-habit="${habit.id}" title="حذف عادت" aria-label="حذف ${escapeHtml(habit.name)}">×</button></div>${cells}</div>`;
         });
         if (!activeHabits().length) rows += `<div class="empty">هنوز عادت فعالی وجود ندارد. از دکمه «افزودن عادت» شروع کن.</div>`;
         rows += `<div class="habit-row add-habit-row"><div class="habit-name"><div class="inline-table-actions"><button class="inline-add-habit" id="inlineAddHabit">＋ افزودن عادت به جدول</button><button class="inline-delete-all" id="inlineDeleteAll" title="حذف همه عادت‌ها">× حذف همه عادت‌ها</button></div></div><div class="add-habit-space"></div></div>`;
@@ -910,5 +913,5 @@
       window.addEventListener('load', () => setTimeout(initializeCurrentView, 50));
     })();
   </script>
-</body>
+<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a22e09297d14bbcd',t:'MTc4NTM0ODE1OA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
 </html>
