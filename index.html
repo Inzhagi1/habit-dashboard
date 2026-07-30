@@ -242,6 +242,22 @@
     .day-label { text-align: center; padding: 3px 0 4px; font-size: 9px; color: #8693a2; line-height: 1.2; }
     .day-label b { display: block; color: #566478; font-size: 10px; }
     .day-label.today { background: #f2f0ff; color: var(--primary); font-weight: 700; }
+    .day-label.holiday,
+    .day-label.friday { background: #ffe3e7; color: #c4475d; font-weight: 800; }
+    .day-label.holiday b,
+    .day-label.friday b { color: #c4475d; }
+    .day-label.friday { box-shadow: inset 0 -3px 0 #d34e65; }
+    .day-label.observance { box-shadow: inset 0 -3px 0 #f2a34d; }
+    .holiday-cell,
+    .friday-cell { background: rgba(220, 72, 94, .13) !important; }
+    .holiday-dot { display: inline-block; width: 5px; height: 5px; border-radius: 50%; background: #d34e65; margin: 0 3px; vertical-align: middle; }
+    .hero-observances { color: rgba(255,255,255,.88) !important; font-size: 10px !important; max-width: 560px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; margin-top: 4px !important; }
+    html[data-theme="dark"] .day-label.holiday,
+    html[data-theme="dark"] .day-label.friday { background: #4a2630; color: #ff9eab; }
+    html[data-theme="dark"] .day-label.holiday b,
+    html[data-theme="dark"] .day-label.friday b { color: #ff9eab; }
+    html[data-theme="dark"] .holiday-cell,
+    html[data-theme="dark"] .friday-cell { background: rgba(220, 72, 94, .22) !important; }
     .habit-row { min-height: 38px; border-bottom: 1px solid var(--line); direction: rtl; }
     .habit-row:last-child { border-bottom: 0; }
     .habit-name { padding: 7px 9px; font-size: 10px; display: flex; align-items: center; gap: 7px; background: var(--surface-raised); position: sticky; right: 0; z-index: 2; direction: rtl; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
@@ -369,6 +385,9 @@
       .layout { grid-template-columns: minmax(0, 1fr) 270px; }
     }
     @media (max-width: 820px) {
+      /* در نمایشگرهای کوچک، نام ماه‌ها روی نوار سال مخفی می‌شود تا قطعه‌ها خوانا و مرتب بمانند. */
+      .year-season-track .season-segment span,
+      .year-season-track .season-marker span { display: none !important; }
       .topbar, .hero { align-items: flex-start; flex-direction: column; }
       .year-progress-card { align-items: center; }
       .top-actions { width: 100%; } .top-actions .select-wrap { flex: 1; } .top-actions select { width: 100%; }
@@ -423,7 +442,7 @@
       </header>
 
       <section class="hero">
-        <div class="hero-content"><h2 id="heroPeriod">مرداد ۱۴۰۵</h2><p class="hero-date" id="heroDate">امروز، ۷ مرداد ۱۴۰۵</p></div>
+        <div class="hero-content"><h2 id="heroPeriod">مرداد ۱۴۰۵</h2><p class="hero-date" id="heroDate">امروز، ۷ مرداد ۱۴۰۵</p><p class="hero-observances" id="heroObservances"></p></div>
         <div class="hero-quote"><span class="quote-label">✦ جمله انگیزشی روز</span><blockquote id="quoteText">هر روز فرصتی تازه برای بهتر شدن است.</blockquote></div>
         <button type="button" class="btn" id="todayBtn" onclick="window.habitFlowGoToCurrentMonth && window.habitFlowGoToCurrentMonth()">بازگشت به ماه جاری</button>
       </section>
@@ -476,6 +495,8 @@
       const gregorianMonths = ['January','February','March','April','May','June','July','August','September','October','November','December'];
       const faGregorianMonths = ['ژانویه','فوریه','مارس','آوریل','مه','ژوئن','ژوئیه','اوت','سپتامبر','اکتبر','نوامبر','دسامبر'];
       const jalaliMonths = ['فروردین','اردیبهشت','خرداد','تیر','مرداد','شهریور','مهر','آبان','آذر','دی','بهمن','اسفند'];
+      const officialHolidays1405 = {"1":{"1":"عید سعید فطر / عید نوروز","2":"تعطیل به مناسبت عید سعید فطر / عید نوروز","3":"عید نوروز","4":"عید نوروز","12":"روز جمهوری اسلامی ایران","13":"روز طبیعت","25":"شهادت امام جعفر صادق (ع)"},"2":{},"3":{"6":"عید سعید قربان","14":"عید سعید غدیر خم / رحلت حضرت امام خمینی","15":"قیام ۱۵ خرداد"},"4":{"3":"تاسوعای حسینی","4":"عاشورای حسینی"},"5":{"13":"اربعین حسینی","21":"رحلت رسول اکرم (ص) / شهادت امام حسن مجتبی (ع)","22":"شهادت امام رضا (ع)","30":"شهادت امام حسن عسکری (ع) / آغاز امامت حضرت مهدی (عج)"},"6":{"8":"ولادت رسول اکرم (ص) / ولادت امام جعفر صادق (ع)"},"7":{},"8":{"22":"شهادت حضرت فاطمه زهرا (س)"},"9":{},"10":{"2":"ولادت امام علی (ع) / روز پدر","16":"مبعث حضرت رسول اکرم (ص)"},"11":{"4":"ولادت حضرت قائم (عج) / روز سربازان گمنام امام زمان","22":"پیروزی انقلاب اسلامی ایران"},"12":{"9":"شهادت حضرت علی (ع)","19":"عید سعید فطر","20":"تعطیل به مناسبت عید سعید فطر","29":"روز ملی شدن صنعت نفت ایران"}};
+      const observances1405 = {"1":{"1":"عید سعید فطر / عید نوروز","2":"عید نوروز / روز جهانی آب","3":"عید نوروز / روز جهانی هواشناسی","4":"عید نوروز","6":"زادروز زرتشت پیامبر","7":"روز هنرهای نمایشی","12":"روز جمهوری اسلامی ایران","13":"روز طبیعت","15":"روز ذخایر ژنتیکی و زیستی","17":"روز فرهنگ پهلوانی و ورزش زورخانه‌ای","18":"روز سلامتی","20":"روز ملی فناوری هسته‌ای / روز هنر انقلاب اسلامی","21":"شهادت امیر سپهبد علی صیاد شیرازی","25":"شهادت امام جعفر صادق (ع) / بزرگداشت عطار نیشابوری","29":"روز ارتش جمهوری اسلامی","30":"ولادت حضرت معصومه (س) / روز دختران","31":"روز گندم و نان"},"2":{"1":"بزرگداشت سعدی / روز نثر فارسی","2":"تأسیس سپاه پاسداران / روز زمین پاک","3":"بزرگداشت شیخ بهایی / روز معماری","5":"شکست حمله نظامی آمریکا به ایران در طبس","9":"ولادت امام رضا (ع) / روز روانشناس و مشاور","10":"روز ملی خلیج فارس","11":"روز جهانی کارگر","12":"روز معلم","15":"روز شیراز / روز جهانی ماما","18":"روز جهانی صلیب سرخ و هلال احمر","19":"روز اسناد ملی و میراث مکتوب","20":"روز گل محمدی و گلاب","25":"بزرگداشت فردوسی / روز پاسداشت زبان فارسی","27":"شهادت امام محمد تقی (ع) / روز ارتباطات و روابط عمومی","28":"بزرگداشت حکیم عمر خیام / روز جهانی موزه","30":"روز ملی جمعیت","31":"روز اهدای عضو، اهدای زندگی"},"3":{"1":"روز بهره‌وری / بزرگداشت ملاصدرا","3":"فتح خرمشهر / روز مقاومت، ایثار و پیروزی","4":"روز دزفول، روز مقاومت و پایداری","5":"روز عرفه","6":"عید سعید قربان","10":"روز جهانی بدون دخانیات","11":"ولادت امام علی النقی (ع)","14":"عید سعید غدیر خم / رحلت امام خمینی","15":"قیام ۱۵ خرداد / روز جهانی محیط زیست","16":"ولادت امام موسی کاظم (ع)","20":"روز صنایع دستی / روز ملی فرش","25":"روز ملی گل و گیاه","27":"روز جهانی بیابان‌زدایی","29":"درگذشت دکتر علی شریعتی","31":"شهادت دکتر مصطفی چمران"},"4":{"1":"جشن آغاز تابستان / روز تبلیغ و اطلاع‌رسانی دینی","3":"تاسوعای حسینی","4":"عاشورای حسینی","5":"روز جهانی مبارزه با مواد مخدر","6":"شهادت امام زین‌العابدین (ع)","7":"روز قوه قضاییه","8":"روز مبارزه با سلاح‌های شیمیایی و میکروبی","10":"روز صنعت و معدن / بزرگداشت صائب تبریزی","12":"روز افشای حقوق بشر آمریکایی","13":"جشن تیرگان","14":"روز قلم","18":"روز ادبیات کودکان و نوجوانان","21":"روز عفاف و حجاب","22":"بزرگداشت خوارزمی / روز فناوری اطلاعات","25":"روز بهزیستی و تأمین اجتماعی","27":"اعلام پذیرش قطعنامه ۵۹۸"},"5":{"4":"بزرگداشت شیخ صفی‌الدین اردبیلی","5":"سالروز عملیات مرصاد","6":"روز کارآفرینی و آموزش‌های فنی و حرفه‌ای","8":"بزرگداشت شیخ شهاب‌الدین سهروردی / روز زنجان","9":"روز اهدای خون","10":"روز جهانی شیر مادر","13":"اربعین حسینی","14":"صدور فرمان مشروطیت / روز حقوق بشر اسلامی","17":"روز خبرنگار","21":"رحلت رسول اکرم (ص) / شهادت امام حسن مجتبی (ع)","22":"شهادت امام رضا (ع) / روز تشکل‌ها","23":"هجرت پیامبر اکرم (ص) / روز مقاومت اسلامی","26":"آغاز بازگشت آزادگان به میهن","28":"کودتای ۲۸ مرداد","30":"شهادت امام حسن عسکری (ع) / آغاز امامت حضرت مهدی (عج)","31":"روز صنعت دفاعی / روز عسل"},"6":{"1":"روز پزشک / بزرگداشت ابوعلی سینا","2":"آغاز هفته دولت","3":"ولادت رسول اکرم (ص) به روایت اهل سنت / آغاز هفته وحدت","4":"روز کارمند","5":"روز داروساز / بزرگداشت محمدبن زکریای رازی","8":"ولادت رسول اکرم (ص) / ولادت امام جعفر صادق (ع)","11":"روز صنعت چاپ","12":"روز مبارزه با استعمار انگلیس","13":"بزرگداشت ابوریحان بیرونی","17":"قیام ۱۷ شهریور","21":"روز سینما","27":"روز شعر و ادب فارسی / بزرگداشت شهریار","31":"آغاز هفته دفاع مقدس"},"7":{"1":"روز پرچم","5":"روز گردشگری","7":"روز آتش‌نشانی و ایمنی / بزرگداشت شمس","8":"بزرگداشت مولوی / روز جهانی ناشنوایان","9":"روز جهانی سالمندان","13":"روز نیروی انتظامی","14":"روز دامپزشکی","15":"روز روستا و عشایر","16":"روز جهانی کودک","20":"بزرگداشت حافظ","22":"روز جهانی استاندارد","24":"ولادت حضرت زینب (س) / روز پرستار","26":"روز تربیت بدنی و ورزش","29":"روز صادرات"},"8":{"1":"بزرگداشت ابوالفضل بیهقی / روز آمار و برنامه‌ریزی","8":"روز نوجوان / روز پدافند غیرعامل","13":"روز دانش‌آموز / روز ملی مبارزه با استکبار جهانی","14":"روز فرهنگ عمومی","18":"روز کیفیت","21":"روز هوافضا","22":"شهادت حضرت فاطمه زهرا (س)","24":"روز کتاب، کتاب‌خوانی و کتابدار","26":"سالروز آزادسازی سوسنگرد"},"9":{"1":"روز صنعت سرب و روی","2":"روز تکریم مادران و همسران شهدا","5":"روز بسیج مستضعفان","7":"روز نیروی دریایی","9":"ولادت حضرت فاطمه زهرا (س) / روز زن","10":"روز مجلس","12":"روز قانون اساسی","13":"روز بیمه","15":"روز حسابدار","16":"روز دانشجو","20":"ولادت امام محمد باقر (ع)","25":"روز پژوهش","26":"روز حمل‌ونقل و رانندگان","27":"روز وحدت حوزه و دانشگاه","30":"شب یلدا"},"10":{"1":"روز آرایشگر","2":"ولادت امام علی (ع) / روز پدر / اعتکاف","3":"روز ثبت احوال","4":"وفات حضرت زینب (س) / بزرگداشت رودکی","5":"روز ایمنی در برابر زلزله","7":"تشکیل نهضت سوادآموزی","9":"روز بصیرت","13":"روز جهانی مقاومت / شهادت سردار سلیمانی","14":"شهادت امام موسی کاظم (ع)","16":"مبعث حضرت رسول اکرم (ص)","19":"قیام خونین مردم قم","22":"ولادت امام حسین (ع) / روز پاسدار","23":"ولادت حضرت ابوالفضل العباس (ع) / روز جانباز","24":"ولادت امام زین‌العابدین (ع)","29":"روز معاینه فنی خودرو"},"11":{"1":"بزرگداشت خاقانی شروانی","4":"ولادت حضرت قائم (عج) / روز سربازان گمنام امام زمان","6":"حماسه مردم آمل","12":"بازگشت امام خمینی به ایران / آغاز دهه فجر","14":"روز فناوری فضایی","19":"روز نیروی هوایی","22":"پیروزی انقلاب اسلامی ایران","28":"وفات حضرت خدیجه (س)","29":"قیام مردم تبریز / روز اقتصاد مقاومتی"},"12":{"3":"ولادت امام حسن مجتبی (ع) / روز اکرام","5":"بزرگداشت خواجه نصیرالدین طوسی / روز مهندسی","6":"شب قدر","7":"ضربت خوردن حضرت علی (ع) / روز نهج‌البلاغه","8":"شب قدر / روز امور تربیتی","9":"شهادت حضرت علی (ع)","10":"شب قدر","14":"روز جهانی قدس / روز احسان و نیکوکاری","15":"روز درختکاری","18":"بزرگداشت سید جمال‌الدین اسدآبادی","19":"عید سعید فطر","20":"تعطیل به مناسبت عید سعید فطر","21":"بزرگداشت نظامی گنجوی","22":"روز بزرگداشت شهدا","25":"بزرگداشت پروین اعتصامی","26":"آخرین چهارشنبه سال","27":"آخرین پنجشنبه سال","29":"روز ملی شدن صنعت نفت ایران"}};
       const weekdays = ['ی','د','س','چ','پ','ج','ش'];
       const colors = ['#f48fb1','#55a9ed','#f2cd4b','#46c98b','#f4a261','#9c8cff','#54b7b0','#e98ba8','#7c9be8','#c6a14a','#55b783','#ef8e5a'];
       const defaultHabits = [
@@ -659,15 +680,26 @@
         if (state.mode === 'jalali') return { primary: faDigits(jd), secondary: weekdays[date.getDay()] };
         return { primary: faDigits(g), secondary: weekdays[date.getDay()] };
       }
+      function jalaliDateParts(date) { const [jy,jm,jd] = gregorianToJalali(date.getFullYear(), date.getMonth()+1, date.getDate()); return {year:jy,month:jm,day:jd}; }
+      function observanceForDate(date) { const p=jalaliDateParts(date); const text=(observances1405[p.month]||{})[p.day]||''; const holiday=!!((officialHolidays1405[p.month]||{})[p.day]); return { ...p, text, holiday, friday:date.getDay()===5 }; }
+      function renderMonthObservances() {
+        const now = new Date();
+        const todayInfo = jalaliDateParts(now);
+        const todayText = (observances1405[todayInfo.month] || {})[todayInfo.day] || '';
+        const todayHoliday = !!((officialHolidays1405[todayInfo.month] || {})[todayInfo.day]);
+        $('heroObservances').textContent = todayText
+          ? `مناسبت امروز، ${faDigits(todayInfo.day)} ${jalaliMonths[todayInfo.month-1]}: ${todayHoliday ? 'تعطیل رسمی · ' : ''}${todayText}`
+          : '';
+      }
       function weekGroups(dates) { const groups=[]; for(let i=0;i<dates.length;i+=7) groups.push(dates.slice(i,i+7)); return groups; }
       function renderCalendar(dates) {
         const grid = $('calendarGrid'); grid.style.setProperty('--days', dates.length);
         const groups = weekGroups(dates);
         const bands = groups.map((g,i) => `<div class="week-band w${Math.min(i+1,5)}" style="grid-column:span ${g.length}">هفته ${faDigits(i+1)}</div>`).join('');
-        const labels = dates.map((date,i) => { const lab=dateLabel(date); const todayClass=dateKey(date)===dateKey(today)?' today':''; return `<div class="day-label${todayClass}" data-quote-date="${dateKey(date)}" title="${escapeHtml(motivationalQuotes[quoteIndexForDate(date)])}"><b>${lab.primary}</b><span>${lab.secondary}</span></div>`; }).join('');
+        const labels = dates.map((date,i) => { const lab=dateLabel(date); const meta=observanceForDate(date); const todayClass=dateKey(date)===dateKey(today)?' today':''; const status=meta.holiday?' holiday':(meta.friday?' friday':(meta.text?' observance':'')); const title=meta.text ? `${meta.holiday?'تعطیل رسمی · ':''}${meta.text}` : (meta.friday ? 'جمعه' : motivationalQuotes[quoteIndexForDate(date)]); return `<div class="day-label${todayClass}${status}" data-quote-date="${dateKey(date)}" title="${escapeHtml(title)}"><b>${lab.primary}</b><span>${lab.secondary}${(meta.holiday||meta.friday)?'<i class="holiday-dot"></i>':''}</span></div>`; }).join('');
         let rows = `<div class="calendar-weeks"><div class="corner">روز / عادت</div>${bands}</div><div class="calendar-days"><div class="corner">${state.mode==='jalali'?'شمسی':'روزهای ماه'}</div>${labels}</div>`;
         activeHabits().forEach(habit => {
-          const cells = dates.map(date => { const checked=isChecked(date,habit.id); const future=date > today && dateKey(date)!==dateKey(today); const sunday=date.getDay()===6?' sunday':''; return `<div class="cell${sunday}" style="background:${hexToRgba(habit.color,.045)}"><button class="check${checked?' checked':''}${future?' future':''}" style="--habit-color:${habit.color}" data-date="${dateKey(date)}" data-habit="${habit.id}" title="${escapeHtml(motivationalQuotes[quoteIndexForDate(date)])}" aria-label="${habit.name} - ${dateKey(date)}" aria-pressed="${checked}"${future?' disabled':''}></button></div>`; }).join('');
+          const cells = dates.map(date => { const checked=isChecked(date,habit.id); const future=date > today && dateKey(date)!==dateKey(today); const meta=observanceForDate(date); const holidayClass=meta.holiday?' holiday-cell':(meta.friday?' friday-cell':''); const title=meta.text ? `${meta.holiday?'تعطیل رسمی · ':''}${meta.text}` : motivationalQuotes[quoteIndexForDate(date)]; return `<div class="cell${holidayClass}" style="background:${meta.holiday?'rgba(220,72,94,.13)':(meta.friday?'rgba(220,72,94,.055)':hexToRgba(habit.color,.045))}"><button class="check${checked?' checked':''}${future?' future':''}" style="--habit-color:${habit.color}" data-date="${dateKey(date)}" data-habit="${habit.id}" title="${escapeHtml(title)}" aria-label="${habit.name} - ${dateKey(date)}" aria-pressed="${checked}"${future?' disabled':''}></button></div>`; }).join('');
           const completedCount = dates.reduce((total,date) => total + (isChecked(date,habit.id) ? 1 : 0), 0);
           const habitGoal = Number(habit.goal) || dates.length;
           rows += `<div class="habit-row"><div class="habit-name editable" data-edit-habit="${habit.id}" title="برای ویرایش عادت کلیک کنید"><i class="habit-dot" style="background:${habit.color}"></i><span>${escapeHtml(habit.name)}</span><small class="habit-count" title="${faDigits(completedCount)} از ${faDigits(habitGoal)} هدف انجام شده">${faDigits(completedCount)} از ${faDigits(habitGoal)}</small><button class="row-delete" data-delete-habit="${habit.id}" title="حذف عادت" aria-label="حذف ${escapeHtml(habit.name)}">×</button></div>${cells}</div>`;
@@ -826,7 +858,7 @@
         applyTheme();
         syncPeriodInputs(); const dates=getViewDates(); if (!dates.some(d => dateKey(d) === selectedQuoteDate)) selectedQuoteDate = dateKey(dates[0]); const data=statsFor(dates); const p=periodText();
         const now = new Date(); const [todayJy,todayJm,todayJd] = gregorianToJalali(now.getFullYear(),now.getMonth()+1,now.getDate());
-        $('breadcrumbPeriod').textContent=p; $('heroPeriod').textContent=p.toUpperCase(); $('heroDate').textContent=`امروز، ${faDigits(todayJd)} ${jalaliMonths[todayJm-1]} ${faDigits(todayJy)}`; $('calendarSubtitle').textContent=`${p} · برای ثبت هر عادت، روی مربع همان روز کلیک کن.`;
+        $('breadcrumbPeriod').textContent=p; $('heroPeriod').textContent=p.toUpperCase(); $('heroDate').textContent=`امروز، ${faDigits(todayJd)} ${jalaliMonths[todayJm-1]} ${faDigits(todayJy)}`; renderMonthObservances(); $('calendarSubtitle').textContent=`${p} · برای ثبت هر عادت، روی مربع همان روز کلیک کن.`;
         renderQuote(); renderYearProgress(); renderCalendar(dates); renderStats(data); renderRanking(data); renderWeekly(dates); renderNotes();
       }
       function switchMode(mode) {
@@ -913,5 +945,5 @@
       window.addEventListener('load', () => setTimeout(initializeCurrentView, 50));
     })();
   </script>
-<script>(function(){function c(){var b=a.contentDocument||(a.contentWindow&&a.contentWindow.document);if(b){var d=b.createElement('script');d.innerHTML="window.__CF$cv$params={r:'a22e09297d14bbcd',t:'MTc4NTM0ODE1OA=='};var a=document.createElement('script');a.src='/cdn-cgi/challenge-platform/scripts/jsd/main.js';document.getElementsByTagName('head')[0].appendChild(a);";b.getElementsByTagName('head')[0].appendChild(d)}}if(document.body){var a=document.createElement('iframe');a.height=1;a.width=1;a.style.position='absolute';a.style.top=0;a.style.left=0;a.style.border='none';a.style.visibility='hidden';document.body.appendChild(a);if('loading'!==document.readyState)c();else if(window.addEventListener)document.addEventListener('DOMContentLoaded',c);else{var e=document.onreadystatechange||function(){};document.onreadystatechange=function(b){e(b);'loading'!==document.readyState&&(document.onreadystatechange=e,c())}}}})();</script></body>
+</body>
 </html>
